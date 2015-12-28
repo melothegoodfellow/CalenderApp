@@ -1,0 +1,342 @@
+<html>
+
+	<head>
+
+	</head>
+
+	<script>
+
+		//var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+		//var days = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31];
+		
+		function setCalender(months)
+		{
+			var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+			//var days = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31];
+			
+			var date = new Date();
+			var currentMonth = date.getMonth();
+			var currentYear = date.getFullYear();
+			var currentDay = date.getDay();
+			var currentDate = date.getDate();
+
+			document.getElementById('monthId').innerHTML = months[currentMonth];
+			document.getElementById('monthId').setAttribute('value',currentMonth);
+			document.getElementById('yearId').innerHTML = currentYear;
+
+			clearTable();
+
+			setDays(getStartDay(currentDate,currentDay),getLastDay(currentMonth,currentYear));
+			//setCurrentDate(currentDate);
+			//console.log('elem '+document.getElementById('day45').innerHTML);
+			
+
+		}
+
+		function setCurrentDate(date)
+		{
+			for (var i = 0;i < 5;i++)
+			{
+				for (var j = 0;j < 7; j++)
+				{
+					var elem = document.getElementById('day'+i+j);
+					if(elem.innerHTML == date)
+						elem.setAttribute('bgcolor','blue');
+				}
+			}
+		}
+
+		function getDaysOfMonth(month,year)
+		{
+			var daysOfMonth = [31,28,31,30,31,30,31,31,30,31,30,31];
+			if(year % 4 == 0 && month ==1)
+				return 29;
+			return daysOfMonth[month];
+		}
+
+		function getPrevMonth(ev)
+		{
+			//console.log(ev.id);
+			var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+			var monthEle = document.getElementById('monthId');
+			console.log();
+			var next = monthEle.getAttribute('value')
+			
+			monthEle.innerHTML = months[changeMonth(parseInt(next)-1)];
+			monthEle.setAttribute('value',parseInt(changeMonth(parseInt(next)-1)));
+			
+			var year = document.getElementById('yearId').innerHTML;
+			
+			document.getElementById('yearId').innerHTML = validPrevYear(parseInt(year),next);
+
+			var prevStartDay = (getPrevMonthStartDay(next) < 0) ? getPrevMonthStartDay(next) + 7 : getPrevMonthStartDay(next);
+
+			clearTable();
+
+			var getDay = document.getElementById("selectDayID");
+			var getDayValue = getDay.options[getDay.selectedIndex].value;
+
+			setDays(prevStartDay + parseInt(getDayValue) ,getDaysOfMonth(changeMonth(parseInt(next)-1),validPrevYear(parseInt(year),next)));
+		}
+
+		function getPrevMonthStartDay(next)
+		{
+			var last = getPrevMonthLastDay(1);
+			var days = getDaysOfMonth(next-1);
+			switch(days)
+			{
+				case 30:
+				 	return (last - 1);
+				case 29:
+					return (last);
+				case 28:
+					return (last + 1);
+				 default:
+				 	return (last - 2);
+			}
+		}
+
+		function getPrevMonthLastDay(key)
+		{
+			for (var i = 0; i <= 6; i++)
+			{
+				for (var j = 0; j <= 7; j++)
+				{
+					if(document.getElementById('day'+i+j) != null)
+						var val = document.getElementById('day'+i+j).innerHTML;
+					if(val == key)
+						break;
+				}
+				if(val == key)
+						break;
+			}
+			return (j-1);
+		}
+
+
+		function getNextMonthStartDay(key)
+		{
+			for (var i = 5; i >= 0; i--)
+			{
+				for (var j = 6; j >= 0; j--)
+				{
+					if(document.getElementById('day'+i+j) != null )
+						var val = document.getElementById('day'+i+j).innerHTML;
+					if(val != key && val != undefined)
+						break;
+				}
+				if(val != key && val != undefined)
+						break;
+			}
+			return (j+1);
+		}
+
+		function getNextMonth(ev)
+		{
+			//console.log(ev.id);
+			
+			var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+			var monthEle = document.getElementById('monthId');
+			console.log();
+			var next = monthEle.getAttribute('value')
+			
+			monthEle.innerHTML = months[changeMonth(parseInt(next)+1)];
+			monthEle.setAttribute('value',parseInt(changeMonth(parseInt(next)+1)));
+			
+			var year = document.getElementById('yearId').innerHTML;
+			
+			document.getElementById('yearId').innerHTML = validNextYear(parseInt(year),next);
+
+			var nextStartDay = getNextMonthStartDay(' ');
+
+			clearTable();
+
+			var getDay = document.getElementById("selectDayID");
+			var getDayValue = getDay.options[getDay.selectedIndex].value;
+
+			setDays(nextStartDay + parseInt(getDayValue),getDaysOfMonth(changeMonth(parseInt(next)+1),validNextYear(parseInt(year),next)));
+		}
+
+		function clearTable()
+		{
+			for (var i = 0;i < 6;i++)
+			 {
+				for (var j = 0;j < 7; j++)
+				{
+					var myNode = document.getElementById("row"+i);
+					while (myNode.firstChild)
+					{
+    					myNode.removeChild(myNode.firstChild);
+					}
+				}
+			}
+		}
+
+		function validPrevYear(year,month)
+		{
+			return (month == 0) ? year - 1 : year;
+		}
+
+		function validNextYear(year,month)
+		{
+			return (month == 11) ? year + 1 : year;
+		}
+
+		function changeMonth(currentMonth)
+		{
+			if(currentMonth > 11)
+				return 0;
+			else if(currentMonth < 0)
+				return 11;
+			return currentMonth;
+		}
+
+		function setDays(startDay,lastDay)
+		{
+			var daysOfWeek = ['Sun','Mon','Tues','Wed','Thurs','Fri','Sat'];
+
+			var count = 1;
+
+			var getDay = document.getElementById("selectDayID");
+			var getDayValue = getDay.options[getDay.selectedIndex].value;
+
+			var getDaysOfWeek  = document.getElementById('daysOfWeekId');
+
+			startDay = ((startDay - parseInt(getDayValue)) < 0) ? (startDay - parseInt(getDayValue)) + 7 : (startDay - parseInt(getDayValue));
+
+			while (getDaysOfWeek.firstChild)
+			{
+    			getDaysOfWeek.removeChild(getDaysOfWeek.firstChild);
+			}
+
+			var j = 0;
+
+			var last = 7 + parseInt(getDayValue);
+
+			for (var i = getDayValue; i < last;i++)
+			{
+
+				var setDaysOfWeek = document.createElement('TD');
+				if(i >= 7)
+				{
+					setDaysOfWeek.innerHTML = daysOfWeek[j];
+					setDaysOfWeek.id = "dayOfWeek"+j;	
+					j++;
+				}
+				else
+				{
+					setDaysOfWeek.innerHTML = daysOfWeek[i];
+					setDaysOfWeek.id = "dayOfWeek"+i;
+
+				}
+				getDaysOfWeek.appendChild(setDaysOfWeek);
+			}
+
+			for (var i = 0; i < 6; i++)
+			{
+				var getTable = document.getElementById('row'+i);
+				for(var j = 0; j < 7;j++)
+				{
+
+					if(count == lastDay+1)
+						break;
+					
+					var elem = document.createElement('TD');
+					elem.setAttribute('id','day'+i+j);
+					elem.innerHTML = count;
+					
+					getTable.appendChild(elem);
+					
+					if(i == 0 && startDay > j)
+					{
+						elem.innerHTML = " ";
+					}
+					else
+						count++;
+
+				}
+			}
+		}
+
+		function getStartDay(currentDate,currentDay)
+		{
+			var day = currentDate%7;
+			return ((day - currentDay - 1) < 0) ? (day - currentDay - 1) * -1 : (day - currentDay - 1) ;
+		}
+
+		function getLastDay(currentMonth,currentYear)
+		{
+			return 31;
+		}
+
+		//function getDay(sel)
+		{
+			//return (console.log(sel[sel.selectedIndex].value));
+		}
+
+	</script>
+	<body onload="setCalender();">
+
+		<div id="displayId">
+
+			<select id="selectDayID" >
+
+				<option id="0" value="0"> Sunday </option>
+				<option id="1" value="1"> Monday </option>
+				<option id="2" value="2"> Tuesday </option>
+				<option id="3" value="3"> Wednesday </option>
+				<option id="4" value="4"> Thursday </option>
+				<option id="5" value="5"> Friday </option>
+				<option id="6" value="6"> Saturday </option>
+
+			</select>
+
+			<input type="button" value="Select" onClick="setCalender();" />
+
+			<table id="calTableId">
+
+				<tr >
+					<td> <input type="button" id="prevId" onClick="getPrevMonth(event);" value="<"/> </td>
+					<td></td>
+					<td id="monthId"> </td>
+					<td id="yearId">  </td>
+					<td> </td>
+					<td> </td>
+					<td> <input type="button" id="nextId" onClick="getNextMonth(event);" value='>' /> </td>
+				</tr>
+
+				<tr id="daysOfWeekId">
+
+				</tr>
+					
+				<tr id="row0" >
+					
+				</tr>
+
+				<tr id="row1" >
+					
+				</tr>
+
+				<tr id="row2" >
+					
+				</tr>
+
+				<tr id="row3" >
+					
+				</tr>
+
+				<tr id="row4" >
+					
+				</tr>
+
+				<tr id="row5" >
+					
+				</tr>
+
+			</table>
+		
+		</div>
+
+	</body>
+
+</html>
